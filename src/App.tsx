@@ -15,7 +15,7 @@ import "./App.css";
 type ViewMode = "timeline" | "list";
 
 function App() {
-  const { state, addEvent, updateEvent, deleteEvent, setConfig, loadState, exportState } =
+  const { state, addEvent, updateEvent, deleteEvent, deleteEvents, setConfig, loadState, exportState } =
     useTimelineState();
   const { config, events } = state;
   const { theme, colors, setTheme, setColors, resetColors } = useTheme();
@@ -126,6 +126,7 @@ function App() {
             events={events}
             onEventClick={(event) => setEditingEvent(event)}
             selectedEventId={editingEvent?.id ?? null}
+            deleteEvents={deleteEvents}
           />
         )}
 

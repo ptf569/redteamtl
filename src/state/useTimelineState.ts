@@ -85,6 +85,13 @@ export function useTimelineState() {
     }));
   }
 
+  function deleteEvents(ids: Set<string>) {
+    setState((prev) => ({
+      ...prev,
+      events: prev.events.filter((e) => !ids.has(e.id)),
+    }));
+  }
+
   function setConfig(config: TimelineConfig) {
     setState((prev) => ({ ...prev, config }));
   }
@@ -110,6 +117,7 @@ export function useTimelineState() {
     addEvent,
     updateEvent,
     deleteEvent,
+    deleteEvents,
     setConfig,
     setEvents,
     loadState,

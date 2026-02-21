@@ -76,6 +76,44 @@
     color: var(--color-blue-team);
 }
 
+.checkbox {
+    cursor: pointer;
+    width: 15px;
+    height: 15px;
+    accent-color: var(--color-red-team);
+}
+
+.bulkBar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    background: var(--bg-input);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.bulkCount {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.bulkDeleteBtn {
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background: var(--color-error, #e74c3c);
+    color: #fff;
+    border-radius: 4px;
+    transition: opacity 0.2s;
+}
+
+.bulkDeleteBtn:hover {
+    opacity: 0.85;
+}
+
 .empty {
     padding: 24px;
     text-align: center;

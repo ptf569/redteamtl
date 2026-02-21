@@ -10,15 +10,18 @@ interface EventListProps {
   events: TimelineEvent[];
   onEventClick: (event: TimelineEvent) => void;
   selectedEventId: string | null;
+  deleteEvents: (ids: Set<string>) => void;
 }
 
 export default function EventList({
   events,
   onEventClick,
   selectedEventId,
+  deleteEvents,
 }: EventListProps) {
   const [sortField, setSortField] = useState<SortField>("date");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   function handleSort(field: SortField) {
     if (sortField === field) {
@@ -49,14 +52,59 @@ export default function EventList({
     return sortDirection === "asc" ? " \u25B2" : " \u25BC";
   };
 
+  function toggleOne(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleAll() {
+    if (selected.size === events.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(events.map((e) => e.id)));
+    }
+  }
+
+  function handleDeleteSelected() {
+    if (selected.size === 0) return;
+    deleteEvents(selected);
+    setSelected(new Set());
+  }
+
+  const allChecked = events.length > 0 && selected.size === events.length;
+
   return (
     <div className={styles.container}>
+      {selected.size > 0 && (
+        <div className={styles.bulkBar}>
+          <span className={styles.bulkCount}>{selected.size} selected</span>
+          <button
+            type="button"
+            className={styles.bulkDeleteBtn}
+            onClick={handleDeleteSelected}
+          >
+            Delete Selected
+          </button>
+        </div>
+      )}
       {events.length === 0 ? (
         <p className={styles.empty}>No events to display.</p>
       ) : (
         <table className={styles.table}>
           <thead>
             <tr>
+              <th className={styles.th}>
+                <input
+                  type="checkbox"
+                  checked={allChecked}
+                  onChange={toggleAll}
+                  className={styles.checkbox}
+                />
+              </th>
               <th
                 className={`${styles.th} ${styles.sortable}`}
                 onClick={() => handleSort("date")}
@@ -86,6 +134,14 @@ export default function EventList({
                 }`}
                 onClick={() => onEventClick(event)}
               >
+                <td className={styles.td} onClick={(e) => e.stopPropagation()}>
+                  <input
+                    type="checkbox"
+                    checked={selected.has(event.id)}
+                    onChange={() => toggleOne(event.id)}
+                    className={styles.checkbox}
+                  />
+                </td>
                 <td className={styles.td}>
                   {format(parseISO(event.date), "MMM d, yyyy")}
                 </td>
