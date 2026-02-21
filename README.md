@@ -3,8 +3,9 @@
 A visual timeline tool for planning and documenting red team / blue team security assessments. Built with React, TypeScript, and Vite.
 
 ### Example
+https://github.com/user-attachments/assets/50565644-73f2-47e3-a14d-bab803875ea3
 
-<video src=".demo/demo.mp4" controls width="100%"></video>
+
 
 ### Exported PNG
 
