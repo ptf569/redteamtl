@@ -3,6 +3,7 @@ export interface TimelineEvent {
   date: string;
   team: "red" | "blue";
   description: string;
+  lane: 1 | 2 | 3 | 4;
 }
 
 export interface TimelineConfig {

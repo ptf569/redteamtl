@@ -40,11 +40,16 @@ function validateEvent(
     ? e.id
     : uuidv4();
 
+  const lane = (e.lane === 1 || e.lane === 2 || e.lane === 3 || e.lane === 4)
+    ? e.lane
+    : 1;
+
   return {
     id,
     date: e.date as string,
     team: e.team as "red" | "blue",
     description: e.description as string,
+    lane,
   };
 }
 

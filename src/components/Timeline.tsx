@@ -312,11 +312,11 @@ export default function Timeline({
   function renderEvent(positioned: PositionedEvent, team: "red" | "blue") {
     if (positioned.truncated) return null;
 
-    const offset = poleHeight + positioned.stackIndex * stackSpacing;
+    const lane = (positioned.event.lane ?? 1) - 1;
+    const offset = poleHeight + lane * stackSpacing;
     const isSelected = selectedEventId === positioned.event.id;
     const isRed = team === "red";
-    const fanOffset = positioned.stackIndex * labelFanAngle;
-    const isStacked = positioned.clusterSize > 1;
+    const fanOffset = lane * labelFanAngle;
 
     const teamClass = isRed ? styles.eventRed : styles.eventBlue;
     const poleClass = isRed ? styles.flagPoleRed : styles.flagPoleBlue;
@@ -324,13 +324,10 @@ export default function Timeline({
     const labelClass = isRed ? styles.eventLabelRed : styles.eventLabelBlue;
     const tooltipClass = isRed ? styles.tooltipRed : styles.tooltipBlue;
 
+    const flagHeadHeight = 10;
     const poleStyle: React.CSSProperties = {
-      height: `${offset}px`,
+      height: `${offset + flagHeadHeight}px`,
     };
-    if (isStacked && positioned.stackIndex > 0) {
-      poleStyle.opacity = 0.6 + positioned.stackIndex * 0.12;
-      poleStyle.width = `${2 + positioned.stackIndex}px`;
-    }
 
     return (
       <div

@@ -46,6 +46,7 @@
 
 .descInput {
     width: 260px;
+    resize: vertical;
 }
 
 .teamToggle {
@@ -83,6 +84,39 @@
 .teamBtnBlue {
     background: var(--color-blue-team);
     color: #fff;
+}
+
+.laneToggle {
+    display: flex;
+    overflow: hidden;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
+.laneBtn {
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    border-right: 1px solid var(--border-color);
+    background: var(--bg-input);
+    color: var(--text-dim);
+    transition: background 0.2s, color 0.2s;
+}
+
+.laneBtn:last-child {
+    border-right: none;
+}
+
+.laneBtn:hover {
+    background: var(--bg-button);
+    color: var(--text-primary);
+}
+
+.laneBtnActive {
+    background: var(--border-hover);
+    color: var(--text-primary);
 }
 
 .submitBtn {

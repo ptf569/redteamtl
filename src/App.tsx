@@ -22,7 +22,7 @@ function App() {
 
   const [editingEvent, setEditingEvent] = useState<TimelineEvent | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("timeline");
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState(2);
 
   function toggleTheme() {
     setTheme(theme === "dark" ? "light" : "dark");

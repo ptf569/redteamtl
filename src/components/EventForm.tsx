@@ -12,6 +12,7 @@ export default function EventForm({ config, addEvent }: EventFormProps) {
   const [date, setDate] = useState("");
   const [team, setTeam] = useState<"red" | "blue">("red");
   const [description, setDescription] = useState("");
+  const [lane, setLane] = useState<1 | 2 | 3 | 4>(1);
   const [errors, setErrors] = useState<{ date?: string; description?: string }>(
     {}
   );
@@ -42,9 +43,10 @@ export default function EventForm({ config, addEvent }: EventFormProps) {
     e.preventDefault();
     if (!validate()) return;
 
-    addEvent({ date, team, description: description.trim() });
+    addEvent({ date, team, description: description.trim(), lane });
     setDate("");
     setDescription("");
+    setLane(1);
     setErrors({});
   }
 
@@ -85,16 +87,32 @@ export default function EventForm({ config, addEvent }: EventFormProps) {
 
       <div className={styles.fieldGroup}>
         <label className={styles.label}>Description</label>
-        <input
-          type="text"
+        <textarea
           className={styles.descInput}
           value={description}
           placeholder="Event description..."
           onChange={(e) => setDescription(e.target.value)}
+          rows={2}
         />
         {errors.description && (
           <span className={styles.error}>{errors.description}</span>
         )}
+      </div>
+
+      <div className={styles.fieldGroup}>
+        <label className={styles.label}>Lane</label>
+        <div className={styles.laneToggle}>
+          {([1, 2, 3, 4] as const).map((n) => (
+            <button
+              key={n}
+              type="button"
+              className={`${styles.laneBtn} ${lane === n ? styles.laneBtnActive : ""}`}
+              onClick={() => setLane(n)}
+            >
+              {n}
+            </button>
+          ))}
+        </div>
       </div>
 
       <button type="submit" className={styles.submitBtn}>

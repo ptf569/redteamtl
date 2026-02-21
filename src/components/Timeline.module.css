@@ -154,12 +154,11 @@
 
 .flagPole {
     position: absolute;
-    width: 2px;
+    width: 1px;
     left: 50%;
     transform: translateX(-50%);
     opacity: 0.8;
-    transition: opacity 0.2s, width 0.2s;
-    border-radius: 1px;
+    transition: opacity 0.2s;
 }
 
 .flagPoleRed {
@@ -194,10 +193,8 @@
 .eventLabel {
     position: absolute;
     font-size: 11px;
-    white-space: nowrap;
-    max-width: 160px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: pre;
+    line-height: 1.3;
     transition: opacity 0.2s, font-weight 0.2s, left 0.2s;
 }
 
@@ -212,7 +209,7 @@
 /* Selected event highlight */
 .eventSelected .flagPole {
     opacity: 1;
-    width: 3px;
+    width: 2px;
 }
 
 .eventSelected .flagHead {
@@ -233,7 +230,8 @@
     border: 1px solid var(--tooltip-border);
     border-radius: 6px;
     padding: 8px 12px;
-    white-space: nowrap;
+    white-space: pre-line;
+    max-width: 300px;
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.15s;
@@ -368,9 +366,7 @@
 
 .overflowItemDesc {
     color: var(--overflow-item-desc);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    white-space: pre-line;
 }
 
 /* Event enter animation */

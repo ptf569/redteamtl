@@ -21,6 +21,7 @@ export default function EventEditor({
   const [date, setDate] = useState(event.date);
   const [team, setTeam] = useState<"red" | "blue">(event.team);
   const [description, setDescription] = useState(event.description);
+  const [lane, setLane] = useState<1 | 2 | 3 | 4>(event.lane ?? 1);
   const [errors, setErrors] = useState<{ date?: string; description?: string }>(
     {}
   );
@@ -52,7 +53,7 @@ export default function EventEditor({
     e.preventDefault();
     if (!validate()) return;
 
-    updateEvent(event.id, { date, team, description: description.trim() });
+    updateEvent(event.id, { date, team, description: description.trim(), lane });
     onClose();
   }
 
@@ -111,16 +112,32 @@ export default function EventEditor({
 
           <div className={styles.fieldGroup}>
             <label className={styles.label}>Description</label>
-            <input
-              type="text"
+            <textarea
               className={styles.descInput}
               value={description}
               placeholder="Event description..."
               onChange={(e) => setDescription(e.target.value)}
+              rows={3}
             />
             {errors.description && (
               <span className={styles.error}>{errors.description}</span>
             )}
+          </div>
+
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>Lane</label>
+            <div className={styles.laneToggle}>
+              {([1, 2, 3, 4] as const).map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  className={`${styles.laneBtn} ${lane === n ? styles.laneBtnActive : ""}`}
+                  onClick={() => setLane(n)}
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className={styles.actions}>

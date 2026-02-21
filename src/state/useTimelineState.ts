@@ -25,30 +25,35 @@ function createDefaultState(): AppState {
         date: week1,
         team: "red",
         description: "Initial recon & OSINT",
+        lane: 1,
       },
       {
         id: uuidv4(),
         date: week2,
         team: "red",
         description: "Phishing campaign launched",
+        lane: 1,
       },
       {
         id: uuidv4(),
         date: week3,
         team: "red",
         description: "Lateral movement achieved",
+        lane: 1,
       },
       {
         id: uuidv4(),
         date: week2,
         team: "blue",
         description: "Suspicious login detected",
+        lane: 1,
       },
       {
         id: uuidv4(),
         date: week4,
         team: "blue",
         description: "Incident response initiated",
+        lane: 1,
       },
     ],
   };
@@ -89,7 +94,11 @@ export function useTimelineState() {
   }
 
   function loadState(newState: AppState) {
-    setState(newState);
+    const migrated = {
+      ...newState,
+      events: newState.events.map((e) => ({ ...e, lane: e.lane ?? (1 as const) })),
+    };
+    setState(migrated);
   }
 
   function exportState(): AppState {
