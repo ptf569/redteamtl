@@ -10,6 +10,7 @@ import EventEditor from "./components/EventEditor";
 import EventList from "./components/EventList";
 import Toolbar from "./components/Toolbar";
 import type { TimelineEvent, AppState } from "./types";
+import type { TimeScale } from "./components/Timeline";
 import "./App.css";
 
 type ViewMode = "timeline" | "list";
@@ -22,6 +23,7 @@ function App() {
 
   const [editingEvent, setEditingEvent] = useState<TimelineEvent | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("timeline");
+  const [timeScale, setTimeScale] = useState<TimeScale>("weeks");
   const [zoom, setZoom] = useState(2);
 
   function toggleTheme() {
@@ -95,19 +97,35 @@ function App() {
             </button>
           </div>
           {viewMode === "timeline" && (
-            <div className="zoom-control">
-              <label className="zoom-label">Zoom</label>
-              <input
-                type="range"
-                className="zoom-slider"
-                min="0.5"
-                max="3"
-                step="0.1"
-                value={zoom}
-                onChange={(e) => setZoom(parseFloat(e.target.value))}
-              />
-              <span className="zoom-value">{Math.round(zoom * 100)}%</span>
-            </div>
+            <>
+              <div className="scale-toggle">
+                <button
+                  className={`scale-toggle-btn ${timeScale === "weeks" ? "scale-toggle-active" : ""}`}
+                  onClick={() => setTimeScale("weeks")}
+                >
+                  Weeks
+                </button>
+                <button
+                  className={`scale-toggle-btn ${timeScale === "days" ? "scale-toggle-active" : ""}`}
+                  onClick={() => setTimeScale("days")}
+                >
+                  Days
+                </button>
+              </div>
+              <div className="zoom-control">
+                <label className="zoom-label">Zoom</label>
+                <input
+                  type="range"
+                  className="zoom-slider"
+                  min="0.5"
+                  max="3"
+                  step="0.1"
+                  value={zoom}
+                  onChange={(e) => setZoom(parseFloat(e.target.value))}
+                />
+                <span className="zoom-value">{Math.round(zoom * 100)}%</span>
+              </div>
+            </>
           )}
         </div>
 
@@ -119,6 +137,7 @@ function App() {
               onEventClick={(event) => setEditingEvent(event)}
               selectedEventId={editingEvent?.id ?? null}
               zoom={zoom}
+              timeScale={timeScale}
             />
           </div>
         ) : (
