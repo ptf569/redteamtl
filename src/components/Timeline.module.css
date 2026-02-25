@@ -62,6 +62,21 @@
     color: var(--timeline-week-dates);
 }
 
+.dayName {
+    font-weight: 600;
+    color: var(--timeline-week-name);
+    font-size: 10px;
+}
+
+.dayDate {
+    font-size: 9px;
+    color: var(--timeline-week-dates);
+}
+
+.tickWeekend {
+    opacity: 0.4;
+}
+
 
 .dayTick {
     position: absolute;

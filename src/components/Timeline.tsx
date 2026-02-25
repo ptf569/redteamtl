@@ -10,6 +10,8 @@ import {
 import type { TimelineConfig, TimelineEvent } from "../types.ts";
 import styles from "./Timeline.module.css";
 
+export type TimeScale = "days" | "weeks";
+
 /*  Convert a calendar day to an evenly-spaced percentage position.
     Each week gets an equal share of the timeline width regardless of
     whether the first/last week is partial.  */
@@ -43,11 +45,23 @@ function dayToEvenPercent(
   return weekIdx * weekWidth + fractionalPos * weekWidth;
 }
 
+/*  Linear day-based positioning: each day gets an equal share  */
+function dayToLinearPercent(
+  day: Date,
+  startDate: Date,
+  totalDays: number
+): number {
+  if (totalDays <= 0) return 0;
+  const dayIndex = differenceInCalendarDays(day, startDate);
+  return (dayIndex / totalDays) * 100;
+}
+
 interface TimelineProps {
   config: TimelineConfig;
   events: TimelineEvent[];
   onEventClick?: (event: TimelineEvent) => void;
   selectedEventId?: string | null;
+  timeScale?: TimeScale;
 }
 
 interface PositionedEvent {
@@ -63,8 +77,7 @@ const PROXIMITY_THRESHOLD_PCT = 1.5;
 
 function getEventPositions(
   events: TimelineEvent[],
-  endDate: Date,
-  weekStarts: Date[]
+  toPercent: (day: Date) => number
 ): { red: PositionedEvent[]; blue: PositionedEvent[] } {
   const red: PositionedEvent[] = [];
   const blue: PositionedEvent[] = [];
@@ -77,11 +90,7 @@ function getEventPositions(
   const blueEvents: { event: TimelineEvent; percent: number }[] = [];
 
   for (const event of sorted) {
-    const percent = dayToEvenPercent(
-      parseISO(event.date),
-      weekStarts,
-      endDate
-    );
+    const percent = toPercent(parseISO(event.date));
     if (event.team === "red") {
       redEvents.push({ event, percent });
     } else {
@@ -206,10 +215,12 @@ export default function Timeline({
   onEventClick,
   selectedEventId,
   zoom = 1,
+  timeScale = "weeks",
 }: TimelineProps & { zoom?: number }) {
   const startDate = parseISO(config.startDate);
   const endDate = parseISO(config.endDate);
   const totalDays = differenceInCalendarDays(endDate, startDate);
+  const isDaysMode = timeScale === "days";
 
   const weekStarts = useMemo(() => {
     if (totalDays <= 0) return [];
@@ -219,8 +230,15 @@ export default function Timeline({
     );
   }, [startDate, endDate, totalDays]);
 
+  const toPercent = useMemo(() => {
+    if (isDaysMode) {
+      return (day: Date) => dayToLinearPercent(day, startDate, totalDays);
+    }
+    return (day: Date) => dayToEvenPercent(day, weekStarts, endDate);
+  }, [isDaysMode, startDate, totalDays, weekStarts, endDate]);
+
   const weeks = useMemo(() => {
-    if (weekStarts.length === 0) return [];
+    if (isDaysMode || weekStarts.length === 0) return [];
     const numWeeks = weekStarts.length;
     return weekStarts.map((weekStart, i) => {
       const percent = (i / numWeeks) * 100;
@@ -231,29 +249,48 @@ export default function Timeline({
         dateRange: `${format(weekStart, "MMM d")} – ${format(weekEnd, "MMM d")}`,
       };
     });
-  }, [weekStarts]);
+  }, [weekStarts, isDaysMode]);
+
+  const days = useMemo(() => {
+    if (!isDaysMode || totalDays <= 0) return [];
+    const allDays = eachDayOfInterval({ start: startDate, end: endDate });
+    return allDays.map((day, i) => {
+      const percent = dayToLinearPercent(day, startDate, totalDays);
+      return {
+        percent,
+        label: `Day ${i + 1}`,
+        dateLabel: format(day, "MMM d"),
+        dayOfWeek: format(day, "EEE"),
+        isWeekend: day.getDay() === 0 || day.getDay() === 6,
+      };
+    });
+  }, [isDaysMode, startDate, endDate, totalDays]);
 
   const dayTicks = useMemo(() => {
-    if (totalDays <= 0) return [];
+    if (isDaysMode || totalDays <= 0) return [];
     const allDays = eachDayOfInterval({ start: startDate, end: endDate });
     return allDays.map((day) => {
       const percent = dayToEvenPercent(day, weekStarts, endDate);
       const dayOfMonth = day.getDate();
       return { percent, dayOfMonth };
     });
-  }, [startDate, endDate, totalDays, weekStarts]);
+  }, [startDate, endDate, totalDays, weekStarts, isDaysMode]);
 
   const { red, blue } = useMemo(
-    () => getEventPositions(events, endDate, weekStarts),
-    [events, endDate, weekStarts]
+    () => getEventPositions(events, toPercent),
+    [events, toPercent]
   );
 
   const poleHeight = 30;
   const stackSpacing = 32;
 
   const BASE_PX_PER_WEEK = 120;
+  const BASE_PX_PER_DAY = 60;
   const numWeeks = Math.max(1, weekStarts.length);
-  const timelineWidth = Math.max(400, numWeeks * BASE_PX_PER_WEEK * zoom + 80);
+  const numDays = Math.max(1, totalDays);
+  const timelineWidth = isDaysMode
+    ? Math.max(400, numDays * BASE_PX_PER_DAY * zoom + 80)
+    : Math.max(400, numWeeks * BASE_PX_PER_WEEK * zoom + 80);
 
   /*  Identify overflow clusters to render "+N more" badges  */
   const redOverflows = useMemo(() => {
@@ -384,7 +421,7 @@ export default function Timeline({
         <div className={styles.bar} />
 
         <div className={styles.ticksContainer}>
-          {dayTicks.map((dt, i) => (
+          {!isDaysMode && dayTicks.map((dt, i) => (
             <div
               key={`day-${i}`}
               className={styles.dayTick}
@@ -395,7 +432,7 @@ export default function Timeline({
               ) : null}
             </div>
           ))}
-          {weeks.map((week, i) => (
+          {!isDaysMode && weeks.map((week, i) => (
             <div key={i}>
               <div
                 className={styles.tick}
@@ -407,6 +444,21 @@ export default function Timeline({
               >
                 <div className={styles.weekName}>{week.label}</div>
                 <div className={styles.weekDates}>{week.dateRange}</div>
+              </div>
+            </div>
+          ))}
+          {isDaysMode && days.map((day, i) => (
+            <div key={`day-${i}`}>
+              <div
+                className={`${styles.tick} ${day.isWeekend ? styles.tickWeekend : ""}`}
+                style={{ left: `${day.percent}%` }}
+              />
+              <div
+                className={styles.tickLabel}
+                style={{ left: `${day.percent}%` }}
+              >
+                <div className={styles.dayName}>{day.label}</div>
+                <div className={styles.dayDate}>{day.dayOfWeek} {day.dateLabel}</div>
               </div>
             </div>
           ))}

@@ -90,6 +90,40 @@
   flex-wrap: wrap;
 }
 
+.scale-toggle {
+  display: flex;
+  gap: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  width: fit-content;
+}
+
+.scale-toggle-btn {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--bg-app);
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.scale-toggle-btn:not(:last-child) {
+  border-right: 1px solid var(--border-color);
+}
+
+.scale-toggle-btn:hover {
+  background: var(--bg-button);
+  color: var(--text-primary);
+}
+
+.scale-toggle-active {
+  background: var(--bg-button);
+  color: var(--text-primary);
+}
+
 .zoom-control {
   display: flex;
   align-items: center;
